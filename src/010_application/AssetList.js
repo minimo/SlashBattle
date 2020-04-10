@@ -21,6 +21,9 @@ phina.namespace(function() {
                 "weapons": "assets/textures/weapons.png",
                 "item": "assets/textures/item.png",
               },
+              sound: {
+                "slash": "assets/sounds/sen_ka_katana_sasinuku01.mp3",
+              },
               // tmx: {
               //   "map1": "assets/map/map2.tmx",
               // },

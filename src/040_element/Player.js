@@ -363,6 +363,7 @@ phina.define("Player", {
         switch (kind) {
             case 0:
                 //ショートソード
+                SoundManager.play("slash");
                 this.weapon.tweener.clear()
                     .set({rotation: 200, alpha: 1.0})
                     .to({rotation: 360}, 10)

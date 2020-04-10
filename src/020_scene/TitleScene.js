@@ -60,6 +60,19 @@ phina.namespace(function() {
         });
         phina.asset.AssetManager.set("image", key + "_mask", tex);
       });
+
+      setTimeout(this.setupPeerList.bind(this), 1000);
+    },
+
+    setupPeerList: function() {
+      const list = ["Alone"].concat(this.app.getPeerList());
+      let y = 50;
+      list.forEach(id => {
+        const peer = Label({ text: id, fill: "white", fontSize: 20, baseline: "middle", align: "left" })
+          .setPosition(30, y)
+          .addChildTo(this)
+          y += 25;
+      });
     },
 
     update: function() {

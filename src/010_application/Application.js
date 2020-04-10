@@ -39,6 +39,13 @@ phina.namespace(function() {
         this.gamepadManager.update();
         this.updateController();
       });
+
+      this.webRTC = {
+        peer: null,
+        id: "",
+        peers: [],
+      };
+      this.setupWebRTC();
     },
   
     //マウスのホールイベント関連
@@ -101,5 +108,53 @@ phina.namespace(function() {
           before: before,
       };
     },
+
+    setupWebRTC: function() {
+      if (this.webRTC.peer) return;
+      this.webRTC.peer = new Peer({
+        key: '344539c4-13d8-4c29-86b1-ca96a66897f7',
+        debug: 3,
+      });
+
+      const peer = this.webRTC.peer;
+      peer.once('open', id => {
+        this.webRTC.id = id;
+        this.webRTC.peer.listAllPeers(peers => this.webRTC.peers = peers);
+      });
+      peer.on('error', err => alert(err.message));
+      peer.on('close', () => {});
+      peer.on('disconnected', () => {});
+      peer.on('connection', dataConnection => {
+        dataConnection.once('open', () => {});
+        dataConnection.on('data', data => {});
+        dataConnection.once('close', () => {});
+      });
+    },
+
+    refreshPeerList: function() {
+      return new Promise(resolve => {
+        this.webRTC.peer.listAllPeers(peers => resolve(peers));
+      });
+    },
+
+    getPeerList: function() {
+      const result = [];
+      this.webRTC.peers.forEach(id => {
+        if (id != this.webRTC.id) result.push(id);
+      });
+      return result;
+    },
+
+    connectWebRTC: function(peerID) {
+      if (this.webRTC.peer == null)return;
+      if (!this.webRTC.peer.open) return;
+
+      const dataConnection = peer.connect(peerID);
+      dataConnection.once('open', () => {
+        console.log(`connection open: ${peerID}`);
+      });
+      dataConnection.on('data', data => {});
+      dataConnection.once('close', () => {});
+    }
   });
 });
