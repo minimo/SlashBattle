@@ -31,6 +31,8 @@ phina.namespace(function() {
         });
         this.loader.load(assets);
       }
+
+      this.app.state = "title";
     },
 
     setup: function() {
@@ -65,11 +67,13 @@ phina.namespace(function() {
     setupPeerList: function() {
       this.peerList = ["StandAlone"].concat(this.app.webRTC.getPeerList());
       let y = 50;
+      this.labelList = [];
       this.peerList.forEach(id => {
         const peer = Label({ text: id, fill: "white", fontSize: 20, baseline: "middle", align: "left" })
           .setPosition(30, y)
-          .addChildTo(this)
-          y += 25;
+          .addChildTo(this);
+        this.labelList.push(peer);
+        y += 25;
       });
 
       this.cursol = Label({ text: ">", fill: "white", fontSize: 20, baseline: "middle", align: "left" })
@@ -97,12 +101,8 @@ phina.namespace(function() {
           this.isExit = true;
         } else {
           const dc = this.app.webRTC.createConnection(this.peerList[this.selectNum]);
-          if (dc.open) {
-            this.isExit = true;
-            this.exit("main");
-          } else {
-            
-          }
+          this.isExit = true;
+          this.exit("main");
         }
       }
       this.beforeKey = ct;

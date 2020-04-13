@@ -6,6 +6,7 @@ phina.namespace(function() {
     init: function(options) {
       this.superInit();
       this.setup();
+      this.app.state = "main";
     },
 
     setup: function() {

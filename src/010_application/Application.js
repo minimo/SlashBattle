@@ -4,6 +4,8 @@ phina.namespace(function() {
     superClass: "phina.display.CanvasApp",
 
     quality: 1.0,
+
+    state: "",
   
     init: function() {
       this.superInit({
@@ -42,6 +44,8 @@ phina.namespace(function() {
 
       this.webRTC = null;
       this.setupWebRTC();
+
+      this.state = "";
     },
   
     //マウスのホールイベント関連
