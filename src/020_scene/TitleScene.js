@@ -16,6 +16,7 @@ phina.namespace(function() {
 
       this.progress = 0;
       this.isExit = false;
+      this.isReady = false;
 
       //ロード済みならアセットロードをしない
       if (TitleScene.isAssetLoaded) {
@@ -43,8 +44,8 @@ phina.namespace(function() {
         .addChildTo(this);
       this.registDispose(label);
 
-      back.setInteractive(true);
-      back.on('pointend', () => this.exit("main"));
+      // back.setInteractive(true);
+      // back.on('pointend', () => this.exit("main"));
 
       //アセット後処理
       const assets = AssetList.get("preload");
@@ -65,23 +66,39 @@ phina.namespace(function() {
     },
 
     setupPeerList: function() {
-      const list = ["Alone"].concat(this.app.getPeerList());
+      this.peerList = ["StandAlone"].concat(this.app.getPeerList());
       let y = 50;
-      list.forEach(id => {
+      this.peerList.forEach(id => {
         const peer = Label({ text: id, fill: "white", fontSize: 20, baseline: "middle", align: "left" })
           .setPosition(30, y)
           .addChildTo(this)
           y += 25;
       });
-    },
+
+      this.cursol = Label({ text: ">", fill: "white", fontSize: 20, baseline: "middle", align: "left" })
+        .setPosition(10, 50 - 2)
+        .addChildTo(this);
+      this.cursol.tweener.clear();
+
+      this.selectNum = 0;
+      this.beforeKey = {};
+      this.isReady = true;
+  },
 
     update: function() {
-      if (!TitleScene.isAssetLoaded || this.isExit) return;
-      var kb = phina_app.keyboard;
-      if (kb.getKey("space") || kb.getKey("z")) {
+      if (!TitleScene.isAssetLoaded || this.isExit || !this.isReady) return;
+      const ct = this.app.controller;
+      if (ct.down && !this.beforeKey.down) {
+        if (this.selectNum < this.peerList.length - 1) this.selectNum++;
+      } else if (ct.up && !this.beforeKey.up) {
+        if (this.selectNum > 0) this.selectNum--;
+      }
+      this.cursol.setPosition(10, this.selectNum * 25 + 48)
+      if (ct.ok) {
         this.isExit = true;
         this.exit("main");
       }
+      this.beforeKey = ct;
     },
 
   });
