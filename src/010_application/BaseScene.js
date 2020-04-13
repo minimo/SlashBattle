@@ -38,7 +38,6 @@ phina.namespace(function() {
         this.destroy();
         this.canvas.destroy();
         this.flare('destroy');
-        console.log("Exit scene.");
       });
     },
 

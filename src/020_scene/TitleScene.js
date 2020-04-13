@@ -44,9 +44,6 @@ phina.namespace(function() {
         .addChildTo(this);
       this.registDispose(label);
 
-      // back.setInteractive(true);
-      // back.on('pointend', () => this.exit("main"));
-
       //アセット後処理
       const assets = AssetList.get("preload");
       assets.image.forIn(key => {
@@ -66,7 +63,7 @@ phina.namespace(function() {
     },
 
     setupPeerList: function() {
-      this.peerList = ["StandAlone"].concat(this.app.getPeerList());
+      this.peerList = ["StandAlone"].concat(this.app.webRTC.getPeerList());
       let y = 50;
       this.peerList.forEach(id => {
         const peer = Label({ text: id, fill: "white", fontSize: 20, baseline: "middle", align: "left" })
@@ -95,8 +92,18 @@ phina.namespace(function() {
       }
       this.cursol.setPosition(10, this.selectNum * 25 + 48)
       if (ct.ok) {
-        this.isExit = true;
-        this.exit("main");
+        if (this.selectNum == 0) {
+          this.exit("main");
+          this.isExit = true;
+        } else {
+          const dc = this.app.webRTC.createConnection(this.peerList[this.selectNum]);
+          if (dc.open) {
+            this.isExit = true;
+            this.exit("main");
+          } else {
+            
+          }
+        }
       }
       this.beforeKey = ct;
     },
