@@ -20,6 +20,7 @@ phina.namespace(function() {
           this.anotherPlayer.isRemotePlayer = true;
         } else {
           this.anotherPlayer.setControlData(data);
+          this.anotherPlayer.setPosition(data.x, data.y);
         }
       })
     },
