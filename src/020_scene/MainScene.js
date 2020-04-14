@@ -7,6 +7,21 @@ phina.namespace(function() {
       this.superInit();
       this.setup();
       this.app.state = "main";
+
+      this.anotherPlayer = null;
+
+      this.app.webRTC.on('data', e => {
+        const data = JSON.parse(e.data);
+        if (!data) return;
+        if (!this.anotherPlayer) {
+          this.anotherPlayer = Player(this)
+            .addChildTo(this)
+            .setPosition(data.x, data.y);
+          this.anotherPlayer.isRemotePlayer = true;
+        } else {
+          this.anotherPlayer.setControlData(data);
+        }
+      })
     },
 
     setup: function() {
@@ -21,6 +36,10 @@ phina.namespace(function() {
     },
 
     update: function() {
+      const data = this.app.controller;
+      data.x = this.player.x;
+      data.y = this.player.y;
+      this.app.webRTC.send(JSON.stringify(data));
     },
 
   });

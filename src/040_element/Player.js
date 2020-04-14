@@ -110,6 +110,14 @@ phina.define("Player", {
         let ct = app.controller;
 
         if (!this.isControl) ct = {};
+        if (this.isRemotePlayer) {
+            if (this.controlData) {
+                ct = this.controlData;
+            } else {
+                ct = {};
+            }
+        }
+
         if (this.stopTime == 0) {
             //左移動
             if (ct.left && !ct.down) {
@@ -499,5 +507,9 @@ phina.define("Player", {
         this._collision[3].setPosition(this.x - w, this.y - 5);
         this.ladderCollision.setPosition(this.x, this.y);
         return this;
+    },
+
+    setControlData: function(data) {
+        this.controlData = data;
     },
 });

@@ -33,7 +33,7 @@ phina.namespace(function() {
 
       peer.on('connection', dataConnection => {
         this.flare('connection', { dataConnection });
-        this.addConnection(dataConnection)
+        this.addConnection(dataConnection);
       });
       peer.on('close', () => this.flare('close'));
       peer.on('disconnected', () => this.flare('disconnected'));
@@ -50,17 +50,22 @@ phina.namespace(function() {
     addConnection(dataConnection) {
       if (!dataConnection) return;
 
-      const id = dataConnection.id;
+      const id = dataConnection.remoteId;
+      const dcId = dataConnection.id;
       dataConnection.once('open', () => {
-        console.log(`connection open: ${id}` );
-        this.dataConnections[id] = dataConnection;
+        this.dataConnections.push(dataConnection);
+        this.flare('open', { dataConnection });
+        console.log(`****** connection open: ${id} dcID: ${dcId}`);
       });
       dataConnection.on('data', data => {
-        this.peerData[id] = data;
-        console.log(`from[${id}] data: ${data}`);
+        // this.peerData[id] = data;
+        this.flare('data', { dataConnection, data });
+        // console.log(`from[${id}] data: ${data}`);
       });
       dataConnection.once('close', () => {
         delete this.peerData[id];
+        this.flare('close', { dataConnection });
+        console.log(`****** connection close: ${id} dcID: ${dcId}`);
       });
       return this;
     },
@@ -72,7 +77,10 @@ phina.namespace(function() {
         toPeerID.forEach(id => this.sendData(id, data));
       } else {
         //接続を確立しているpeer全てに送出
-        this.dataConnections.forEach(dc => dc.send(data));
+        this.dataConnections.forEach(dc => {
+          // console.log(`send to ${dc.remoteId} data: ${data}`);
+          dc.send(data)
+        });
       }
     },
 

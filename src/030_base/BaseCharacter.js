@@ -133,6 +133,7 @@ phina.define("BaseCharacter", {
             this.isOnFloor = true;
             this.isJump = false;
             this.vy = 0;
+            this.y = 300;
         }
 
         //アニメーション
