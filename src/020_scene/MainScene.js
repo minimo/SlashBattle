@@ -10,7 +10,7 @@ phina.namespace(function() {
 
       this.anotherPlayer = null;
 
-      this.app.webRTC.on('data', e => {
+      this.on('data', e => {
         const data = JSON.parse(e.data);
         if (!data) return;
         if (!this.anotherPlayer) {
@@ -34,7 +34,10 @@ phina.namespace(function() {
       this.player = Player(this)
         .addChildTo(this)
         .setPosition(500, 100);
-    },
+      Label({ text: "▼", fill: "white", fontSize: 8 })
+        .addChildTo(this.player)
+        .setPosition(0, -20);
+},
 
     update: function() {
       const data = this.app.controller;

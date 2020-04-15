@@ -111,7 +111,7 @@ phina.namespace(function() {
 
     setupWebRTC: function() {
       if (this.webRTC) return;
-      this.webRTC = WebRTC();
+      this.webRTC = WebRTC(this);
     },
   });
 });

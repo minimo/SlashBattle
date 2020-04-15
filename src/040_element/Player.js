@@ -135,7 +135,7 @@ phina.define("Player", {
             //ジャンプボタンのみ
             if (ct.jump && !ct.up) {
                 //ジャンプ二段目以降
-                if (this.isJump && this.numJump < this.numJumpMax && this.vy > -5) {
+                if (this.isJump && this.numJump < this.numJumpMax && this.vy > -(this.jumpPower / 2)) {
                     this.vy = -this.jumpPower;
                     this.numJump++;
                 }

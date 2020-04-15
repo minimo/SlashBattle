@@ -61,17 +61,27 @@ phina.namespace(function() {
         phina.asset.AssetManager.set("image", key + "_mask", tex);
       });
 
-      setTimeout(this.setupPeerList.bind(this), 1000);
+      setTimeout(this.setupPeerList.bind(this), 10);
+      // this.on('open', () => {
+      //   this.app.webRTC.refreshPeerList()
+      //     .then(() => {
+      //       this.setupPeerList();
+      //       console.log("オープンしたよ！");
+      //     });
+      // });
+
+      Label({ text: this.app.webRTC.id, fill: "white", fontSize: 16, baseline: "middle", align: "right" })
+        .setPosition(SCREEN_WIDTH * 0.95, SCREEN_HEIGHT * 0.95)
+        .addChildTo(this);
+      console.log("peer id" + this.app.webRTC.id);
     },
 
     setupPeerList: function() {
-      Label({ text: this.app.webRTC.id, fill: "white", fontSize: 16, baseline: "middle", align: "right" })
-        .setPosition(SCREEN_WIDTH, SCREEN_HEIGHT * 0.9)
-        .addChildTo(this);
-      
-      this.peerList = ["StandAlone"].concat(this.app.webRTC.getPeerList());
-      let y = 50;
+      if (this.labelList) this.labelList.forEach(e => e.remove());
       this.labelList = [];
+      
+      let y = 50;
+      this.peerList = ["StandAlone"].concat(this.app.webRTC.getPeerList());
       this.peerList.forEach(id => {
         const peer = Label({ text: id, fill: "white", fontSize: 20, baseline: "middle", align: "left" })
           .setPosition(30, y)
