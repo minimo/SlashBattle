@@ -15,7 +15,7 @@ phina.namespace(function() {
         if (!data) return;
         if (!this.anotherPlayer) {
           this.anotherPlayer = Player(this)
-            .addChildTo(this)
+            .addChildTo(this.layers[LAYER_ENEMY])
             .setPosition(data.x, data.y);
           this.anotherPlayer.isRemotePlayer = true;
         } else {
@@ -31,16 +31,22 @@ phina.namespace(function() {
         .addChildTo(this);
       this.registDispose(back);
 
-      this.base = DisplayElement()
-        .addChildTo(this)
+      this.base = DisplayElement().addChildTo(this);
 
+      this.layers = [];
+      (NUM_LAYERS).times(i => {
+        const layer = DisplayElement().addChildTo(this.base)
+        this.layers.push(layer);
+      });
+  
       this.map = WorldMap("map1")
-        .setPosition(0, -200)
-        .addChildTo(this.base);
+        .setPosition(0, -250)
+        .addChildTo(this.layers[LAYER_MAP]);
 
       this.player = Player(this)
-        .addChildTo(this)
+        .addChildTo(this.layers[LAYER_PLAYER])
         .setPosition(500, 100);
+
       Label({ text: "▼", fill: "white", fontSize: 8 })
         .addChildTo(this.player)
         .setPosition(0, -20);
