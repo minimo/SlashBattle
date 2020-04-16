@@ -24,12 +24,13 @@ phina.namespace(function() {
               sound: {
                 "slash": "assets/sounds/sen_ka_katana_sasinuku01.mp3",
               },
-              // tmx: {
-              //   "map1": "assets/map/map2.tmx",
-              // },
-              // tsx: {
-              //   "tile_a": "assets/map/tile_a.tsx",
-              // }
+              tmx: {
+                "map1": "assets/map/main.tmx",
+              },
+              tsx: {
+                "tile_a": "assets/map/tileA.tsx",
+                "tile_d": "assets/map/tileD.tsx",
+              }
             };
             case "common":
             return {

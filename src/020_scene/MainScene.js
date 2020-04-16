@@ -31,13 +31,20 @@ phina.namespace(function() {
         .addChildTo(this);
       this.registDispose(back);
 
+      this.base = DisplayElement()
+        .addChildTo(this)
+
+      this.map = WorldMap("map1")
+        .setPosition(0, -200)
+        .addChildTo(this.base);
+
       this.player = Player(this)
         .addChildTo(this)
         .setPosition(500, 100);
       Label({ text: "▼", fill: "white", fontSize: 8 })
         .addChildTo(this.player)
         .setPosition(0, -20);
-},
+    },
 
     update: function() {
       const data = this.app.controller;
