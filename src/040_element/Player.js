@@ -42,18 +42,7 @@ phina.define("Player", {
     isAttack: false,
 
     //前フレームの情報
-    before: {
-        //操作系
-        up: false,
-        down: false,
-        attack: false,
-        jump: false,
-        change: false,
-        isStun: false,
-        isOnFloor: false,
-        x: 0,
-        y: 0,
-    },
+    before: null,
 
     init: function(parentScene) {
         this.superInit(parentScene, {width: 16, height: 20});
@@ -104,6 +93,20 @@ phina.define("Player", {
 
         //はしご接触判定用
         this.ladderCollision = phina.display.RectangleShape({width: 16, height: 20});
+        
+        this.before = {
+            //操作系
+            up: false,
+            down: false,
+            attack: false,
+            jump: false,
+            change: false,
+            isStun: false,
+            isOnFloor: false,
+            x: 0,
+            y: 0,
+        };
+    
     },
 
     update: function(app) {
