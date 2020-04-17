@@ -26,10 +26,14 @@ phina.namespace(function() {
     },
 
     setup: function() {
-      const back = RectangleShape({ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, fill: "black" })
-        .setPosition(SCREEN_WIDTH_HALF, SCREEN_HEIGHT_HALF)
+      // const back = RectangleShape({ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, fill: "black" })
+      //   .setPosition(SCREEN_WIDTH_HALF, SCREEN_HEIGHT_HALF)
+      //   .addChildTo(this);
+      // this.registDispose(back);
+      this.back = Sprite("back")
+        .setOrigin(0, 0)
+        .setScale(1.5)
         .addChildTo(this);
-      this.registDispose(back);
 
       this.base = DisplayElement().addChildTo(this);
 
@@ -38,7 +42,10 @@ phina.namespace(function() {
         const layer = DisplayElement().addChildTo(this.base)
         this.layers.push(layer);
       });
-  
+      //レイヤーショートカット
+      this.playerLayer = this.layers[LAYER_PLAYER];
+      this.enemyLayer = this.layers[LAYER_ENEMY];
+      
       this.map = WorldMap("map1")
         .setPosition(0, -250)
         .addChildTo(this.layers[LAYER_MAP]);

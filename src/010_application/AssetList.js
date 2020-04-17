@@ -20,6 +20,7 @@ phina.namespace(function() {
                 "shadow": "assets/textures/shadow.png",
                 "weapons": "assets/textures/weapons.png",
                 "item": "assets/textures/item.png",
+                "back": "assets/textures/back-s03b.png",
               },
               sound: {
                 "slash": "assets/sounds/sen_ka_katana_sasinuku01.mp3",

@@ -33,6 +33,7 @@ phina.namespace(function() {
       }
 
       this.app.state = "title";
+      this.dcList = [];
     },
 
     setup: function() {
@@ -62,13 +63,13 @@ phina.namespace(function() {
       });
 
       setTimeout(this.setupPeerList.bind(this), 10);
-      // this.on('open', () => {
-      //   this.app.webRTC.refreshPeerList()
-      //     .then(() => {
-      //       this.setupPeerList();
-      //       console.log("オープンしたよ！");
-      //     });
-      // });
+      this.on('open', () => {
+          this.app.webRTC.refreshPeerList()
+            .then(() => {
+              console.log("オープンしたよ！");
+              this.setupPeerList();
+            });
+      });
 
       Label({ text: this.app.webRTC.id, fill: "white", fontSize: 16, baseline: "middle", align: "right" })
         .setPosition(SCREEN_WIDTH * 0.95, SCREEN_HEIGHT * 0.95)
@@ -88,11 +89,15 @@ phina.namespace(function() {
           .addChildTo(this);
         this.labelList.push(peer);
         if (id != "StandAlone") {
-           const dc = this.app.webRTC.createConnection(id);
+          const dc = this.dcList.find(e => e.remoteId == id);
+          if (!dc) {
+            this.dcList.push(this.app.webRTC.createConnection(id));
+          }
         }
         y += 25;
       });
 
+      if (this.cursol) this.cursol.remove();
       this.cursol = Label({ text: ">", fill: "white", fontSize: 20, baseline: "middle", align: "left" })
         .setPosition(10, 50 - 2)
         .addChildTo(this);
