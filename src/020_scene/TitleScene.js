@@ -63,12 +63,15 @@ phina.namespace(function() {
       });
 
       setTimeout(this.setupPeerList.bind(this), 10);
-      this.on('open', () => {
-          this.app.webRTC.refreshPeerList()
-            .then(() => {
-              console.log("オープンしたよ！");
-              this.setupPeerList();
-            });
+      this.on('open', e => {
+        console.log(`オープンしたよ！ id: ${e.dataConnection.remoteId}`);
+        this.app.webRTC.refreshPeerList()
+          .then(() => this.setupPeerList());
+      });
+      this.on('close', e => {
+        console.log(`クローズしたよ！ id: ${e.dataConnection.remoteId}`);
+        this.app.webRTC.refreshPeerList()
+          .then(() => this.setupPeerList());
       });
 
       Label({ text: this.app.webRTC.id, fill: "white", fontSize: 16, baseline: "middle", align: "right" })
@@ -124,9 +127,8 @@ phina.namespace(function() {
           this.exit("main");
           this.isExit = true;
         } else {
-          // const dc = this.app.webRTC.createConnection(this.peerList[this.selectNum]);
           this.isExit = true;
-          this.exit("main");
+          this.exit("sync");
         }
       }
       this.beforeKey = ct;

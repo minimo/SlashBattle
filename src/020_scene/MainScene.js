@@ -22,7 +22,13 @@ phina.namespace(function() {
           this.anotherPlayer.setControlData(data);
           this.anotherPlayer.setPosition(data.x, data.y);
         }
-      })
+      });
+
+      this.on("close", () => {
+        if (!this.anotherPlayer) return;
+        this.anotherPlayer.remove();
+        this.anotherPlayer = null;
+      });
     },
 
     setup: function() {

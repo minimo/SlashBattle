@@ -101,6 +101,9 @@ phina.define("Player", {
         this.lastOnFloorY = 0;
 
         this.reset();
+
+        //はしご接触判定用
+        this.ladderCollision = phina.display.RectangleShape({width: 16, height: 20});
     },
 
     update: function(app) {

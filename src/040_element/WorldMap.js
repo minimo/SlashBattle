@@ -15,8 +15,8 @@ phina.namespace(function() {
         .setOrigin(0, 0)
         .addChildTo(this);
 
-      // this.collision = this.layerToArray("collision");
-      this.floorData = this.layerToArray("floor");
+      this.collision = this.layerToArray("collision");
+      // this.floorData = this.layerToArray("floor");
       // this.event = this.layerToArray("event");
     },
 

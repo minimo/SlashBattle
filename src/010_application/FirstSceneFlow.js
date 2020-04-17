@@ -19,6 +19,10 @@ phina.namespace(function() {
             nextLabel: "home",
           },
           {
+            label: "sync",
+            className: "SyncRemoteScene",
+          },
+          {
             label: "main",
             className: "MainScene",
           },

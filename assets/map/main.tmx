@@ -90,7 +90,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup color="#ffff0a" name="floor">
+ <objectgroup color="#ffff0a" name="collision">
   <object id="1" x="32" y="545" width="574" height="29"/>
  </objectgroup>
 </map>

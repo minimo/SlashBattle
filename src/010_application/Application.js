@@ -112,6 +112,14 @@ phina.namespace(function() {
     setupWebRTC: function() {
       if (this.webRTC) return;
       this.webRTC = WebRTC(this);
+      this.remoteConnectionList = [];
+    },
+
+    setConnection: function(dataConnection) {
+      const res = this.remoteConnectionList.find(e => e.remoteId == dataConnection.remoteId);
+      if (!res) {
+        this.remoteConnectionList.push(dataConnection);
+      }
     },
   });
 });
