@@ -10,8 +10,8 @@ phina.namespace(function() {
 
       this.anotherPlayer = null;
 
-      this.on('data', e => {
-        const data = JSON.parse(e.data);
+      this.on('playerdata', e => {
+        const data = e.data;
         if (!data) return;
         if (!this.anotherPlayer) {
           this.anotherPlayer = Player(this)
@@ -21,6 +21,7 @@ phina.namespace(function() {
         } else {
           this.anotherPlayer.setControlData(data);
           this.anotherPlayer.setPosition(data.x, data.y);
+          this.anotherPlayer.sprite.scaleX = data.scaleX;
         }
       });
 
@@ -69,7 +70,8 @@ phina.namespace(function() {
       const data = this.app.controller;
       data.x = this.player.x;
       data.y = this.player.y;
-      this.app.webRTC.send(JSON.stringify(data));
+      data.scaleX = this.player.sprite.scaleX;
+      this.app.webRTC.sendEvent("playerdata", data);
     },
 
   });
