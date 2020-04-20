@@ -7,7 +7,6 @@ phina.namespace(function() {
     id: "",
     peer: null,
     peerList: null,
-    peerData: null,
     dataConnections: null,
 
     isReady: false,
@@ -65,18 +64,17 @@ phina.namespace(function() {
       });
 
       dataConnection.on('data', data => {
-        // this.peerData[id] = data;
         this.flare('data', { dataConnection, data });
         this.app.currentScene.flare('data', { dataConnection, data });
+
         const parseData = JSON.parse(data);
-        if (parseData && parseData.event) {
-          this.app.currentScene.flare(parseData.event, { data: parseData.data });
+        if (parseData && parseData.eventName) {
+          this.app.currentScene.flare(parseData.eventName, { data: parseData.data });
         }
         // console.log(`from[${id}] data: ${data}`);
       });
 
       dataConnection.once('close', () => {
-        // delete this.peerData[id];
         this.flare('close', { dataConnection });
         this.app.currentScene.flare('close', { dataConnection });
         console.log(`****** connection close: ${id} dcID: ${dcId}`);
@@ -100,28 +98,24 @@ phina.namespace(function() {
           if (dc.open) dc.send(data)
         });
       }
+      return this;
     },
 
-    sendEvent: function(event, data, toPeerID) {
-      const eventData = JSON.stringify({ event, data });
-      if (typeof(toPeerID) == "string") {
-        this.sendData(toPeerID, eventData);
-      } else if (toPeerID instanceof Array) {
-        toPeerID.forEach(id => this.sendData(id, eventData));
-      } else {
-        //接続を確立しているpeer全てに送出
-        this.dataConnections.forEach(dc => {
-          // console.log(`send to ${dc.remoteId} data: ${data}`);
-          if (dc.open) dc.send(eventData)
-        });
-      }
+    sendEvent: function(eventName, data, toPeerID) {
+      const eventData = JSON.stringify({ eventName, data });
+      this.send(eventData, toPeerID);
+      return this;
     },
 
     sendData: function(toPeerID, data) {
       const dc = this.dataConnections[peerID];
       if (dc) {
         if (dc.open) {
-          dc.send(data);
+          if (typeof data == "object") {
+            dc.send(JSON.stringify(data));
+          } else {
+            dc.send(data);
+          }
         } else {
           console.log(`Data connection not open: ${toPeerID}`);
         }
@@ -148,12 +142,14 @@ phina.namespace(function() {
           if (dc.open) dc.close(true);
         });
       }
+      return this;
     },
 
     destroy: function() {
-      if (!this.peer) return;
+      if (!this.peer) return this;
       this.dataConnections.forEach(dc => dc.close(true));
       this.peer.destroy();
+      return this;
     },
 
     refreshPeerList: function() {
