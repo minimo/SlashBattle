@@ -68,6 +68,10 @@ phina.namespace(function() {
         // this.peerData[id] = data;
         this.flare('data', { dataConnection, data });
         this.app.currentScene.flare('data', { dataConnection, data });
+        const parseData = JSON.parse(data);
+        if (parseData && parseData.event) {
+          this.app.currentScene.flare(parseData.event, { data: parseData.data });
+        }
         // console.log(`from[${id}] data: ${data}`);
       });
 
@@ -94,6 +98,21 @@ phina.namespace(function() {
         this.dataConnections.forEach(dc => {
           // console.log(`send to ${dc.remoteId} data: ${data}`);
           if (dc.open) dc.send(data)
+        });
+      }
+    },
+
+    sendEvent: function(event, data, toPeerID) {
+      const eventData = JSON.stringify({ event, data });
+      if (typeof(toPeerID) == "string") {
+        this.sendData(toPeerID, eventData);
+      } else if (toPeerID instanceof Array) {
+        toPeerID.forEach(id => this.sendData(id, eventData));
+      } else {
+        //接続を確立しているpeer全てに送出
+        this.dataConnections.forEach(dc => {
+          // console.log(`send to ${dc.remoteId} data: ${data}`);
+          if (dc.open) dc.send(eventData)
         });
       }
     },
