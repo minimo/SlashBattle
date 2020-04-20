@@ -14,6 +14,13 @@ phina.namespace(function() {
     init: function(options) {
       this.superInit();
       this.setup();
+
+      this.on('remote_sync_start', () => {
+        //疎通確認を行う
+      });
+
+      this.on('remote_sync_ok', () => {
+      });
     },
 
     setup: function() {
