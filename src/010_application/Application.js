@@ -46,6 +46,14 @@ phina.namespace(function() {
       this.setupWebRTC();
 
       this.state = "";
+
+      //ページを閉じた場合にイベント発火
+      window.addEventListener("beforeunload", () => {
+        this.currentScene.flare("beforeunload");
+        if (this.webRTC) {
+          this.webRTC.destroy();
+        }
+      });
     },
   
     //マウスのホールイベント関連

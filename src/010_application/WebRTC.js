@@ -80,6 +80,10 @@ phina.namespace(function() {
       return this;
     },
 
+    getDataConnection: function(peerID) {
+      return this.dataConnections[peerID];
+    },
+
     send: function(data, toPeerID) {
       if (typeof(toPeerID) == "string") {
         this.sendData(toPeerID, data);
@@ -95,7 +99,7 @@ phina.namespace(function() {
     },
 
     sendData: function(toPeerID, data) {
-      const dc = this.dataConnections[toPeerID];
+      const dc = this.dataConnections[peerID];
       if (dc) {
         if (dc.open) {
           dc.send(data);
@@ -106,6 +110,31 @@ phina.namespace(function() {
         console.log(`Data send failed: ${toPeerID}`);
       }
       return this;
+    },
+
+    close: function(toPeerID) {
+      if (typeof(toPeerID) == "string") {
+        const dc = this.dataConnections[toPeerID];
+        if (dc) {
+          dc.close(true);
+        }
+      } else if (toPeerID instanceof Array) {
+        toPeerID.forEach(id => {
+          const dc = this.dataConnections[id];
+          if (dc && dc.remoteId == id) dc.close(true);
+        });
+      } else {
+        //接続を確立しているpeer全てを閉じる
+        this.dataConnections.forEach(dc => {
+          if (dc.open) dc.close(true);
+        });
+      }
+    },
+
+    destroy: function() {
+      if (!this.peer) return;
+      this.dataConnections.forEach(dc => dc.close(true));
+      this.peer.destroy();
     },
 
     refreshPeerList: function() {
