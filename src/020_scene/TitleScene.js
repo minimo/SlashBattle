@@ -63,12 +63,12 @@ phina.namespace(function() {
       });
 
       setTimeout(this.setupPeerList.bind(this), 10);
-      this.on('open', e => {
+      this.on('webrtc_dataconnection_open', e => {
         console.log(`オープンしたよ！ id: ${e.dataConnection.remoteId}`);
         this.app.webRTC.refreshPeerList()
           .then(() => this.setupPeerList());
       });
-      this.on('close', e => {
+      this.on('webrtc_dataconnection_close', e => {
         console.log(`クローズしたよ！ id: ${e.dataConnection.remoteId}`);
         this.app.webRTC.refreshPeerList()
           .then(() => this.setupPeerList());

@@ -25,7 +25,7 @@ phina.namespace(function() {
         }
       });
 
-      this.on("close", () => {
+      this.on("webrtc_dataconnection_close", () => {
         if (!this.anotherPlayer) return;
         this.anotherPlayer.remove();
         this.anotherPlayer = null;

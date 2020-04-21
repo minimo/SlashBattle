@@ -59,13 +59,13 @@ phina.namespace(function() {
 
       dataConnection.once('open', () => {
         this.dataConnections.push(dataConnection);
-        this.app.currentScene.flare('open', { dataConnection });
+        this.app.currentScene.flare('webrtc_dataconnection_open', { dataConnection });
         console.log(`****** connection open: ${id} dcID: ${dcId}`);
       });
 
       dataConnection.on('data', data => {
         this.flare('data', { dataConnection, data });
-        this.app.currentScene.flare('data', { dataConnection, data });
+        this.app.currentScene.flare('webrtc_dataconnection_data', { dataConnection, data });
 
         const parseData = JSON.parse(data);
         if (parseData && parseData.eventName) {
@@ -76,7 +76,7 @@ phina.namespace(function() {
 
       dataConnection.once('close', () => {
         this.flare('close', { dataConnection });
-        this.app.currentScene.flare('close', { dataConnection });
+        this.app.currentScene.flare('webrtc_dataconnection_close', { dataConnection });
         console.log(`****** connection close: ${id} dcID: ${dcId}`);
       });
       return this;
