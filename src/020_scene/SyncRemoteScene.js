@@ -15,6 +15,9 @@ phina.namespace(function() {
       this.superInit();
       this.setup();
 
+      this.webRTC = this.app.webRTC;
+      this.webRTC.sendEvent("request_battle");
+
       this.on('remote_sync_start', () => {
         //疎通確認を行う
       });

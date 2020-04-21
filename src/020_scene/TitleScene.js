@@ -34,6 +34,7 @@ phina.namespace(function() {
 
       this.app.state = "title";
       this.dcList = [];
+      this.webRTC = this.app.webRTC;
     },
 
     setup: function() {
@@ -42,7 +43,7 @@ phina.namespace(function() {
         .addChildTo(this);
       this.registDispose(back);
 
-      const label = Label({ text: "TitleScene", fill: "white" })
+      const label = Label({ text: "Slash Battle", fill: "white" })
         .setPosition(SCREEN_WIDTH_HALF, SCREEN_HEIGHT_HALF)
         .addChildTo(this);
       this.registDispose(label);
@@ -62,16 +63,22 @@ phina.namespace(function() {
         phina.asset.AssetManager.set("image", key + "_mask", tex);
       });
 
+      //WebRTCメッセージ待ち受け
       setTimeout(this.setupPeerList.bind(this), 10);
       this.on('webrtc_dataconnection_open', e => {
         console.log(`オープンしたよ！ id: ${e.dataConnection.remoteId}`);
-        this.app.webRTC.refreshPeerList()
+        this.isReady = false;
+        this.webRTC.refreshPeerList()
           .then(() => this.setupPeerList());
       });
       this.on('webrtc_dataconnection_close', e => {
         console.log(`クローズしたよ！ id: ${e.dataConnection.remoteId}`);
-        this.app.webRTC.refreshPeerList()
+        this.isReady = false;
+        this.webRTC.refreshPeerList()
           .then(() => this.setupPeerList());
+      });
+      this.on('request_battle', () => {
+        this.dialog = Dialog().addChildTo(this).open();
       });
 
       Label({ text: this.app.webRTC.id, fill: "white", fontSize: 16, baseline: "middle", align: "right" })
@@ -81,17 +88,19 @@ phina.namespace(function() {
     },
 
     setupPeerList: function() {
+      //一覧ラベルを一旦解放
       if (this.labelList) this.labelList.forEach(e => e.remove());
       this.labelList = [];
-      
+
+      //一覧を作成
       let y = 50;
-      this.peerList = ["StandAlone"].concat(this.app.webRTC.getPeerList());
+      this.peerList = ["Single play"].concat(this.app.webRTC.getPeerList());
       this.peerList.forEach(id => {
         const peer = Label({ text: id, fill: "white", fontSize: 20, baseline: "middle", align: "left" })
           .setPosition(30, y)
           .addChildTo(this);
         this.labelList.push(peer);
-        if (id != "StandAlone") {
+        if (id != "Single play") {
           const dc = this.dcList.find(e => e.remoteId == id);
           if (!dc) {
             this.dcList.push(this.app.webRTC.createConnection(id));
@@ -124,16 +133,22 @@ phina.namespace(function() {
 
       if (ct.ok) {
         if (this.selectNum == 0) {
+          this.isExit = true;
           this.exit("main");
-          this.isExit = true;
+          this.closePeers();
         } else {
+          const id = this.labelList[this.selectNum].text;
           this.isExit = true;
-          this.exit("sync");
+          this.exit("sync", { isSelect: true, remoteId: id });
         }
       }
+
       this.beforeKey = ct;
     },
 
+    closeAllPeers: function() {
+      this.webRTC.close();
+    },
   });
 
 });
