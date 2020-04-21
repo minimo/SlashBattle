@@ -135,7 +135,7 @@ phina.namespace(function() {
         if (this.selectNum == 0) {
           this.isExit = true;
           this.exit("main");
-          this.closePeers();
+          this.closeAllPeers();
         } else {
           const id = this.labelList[this.selectNum].text;
           this.isExit = true;
@@ -147,7 +147,9 @@ phina.namespace(function() {
     },
 
     closeAllPeers: function() {
-      this.webRTC.close();
+      this.dcList.forEach(dc => {
+        if (dc.open) dc.close();
+      });
     },
   });
 
