@@ -23,6 +23,8 @@ phina.namespace(function() {
       this.base = RectangleShape({
         width: this.width,
         height: this.height,
+        fill: "black",
+        stroke: "white",
       }).addChildTo(this);
       this.tweener.clear().to({ scaleX: 1.0, scaleY: 1.0 }, 200, "easeInOutQuad");
       return this;

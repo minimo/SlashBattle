@@ -18,6 +18,8 @@ phina.namespace(function() {
       this.webRTC = this.app.webRTC;
       this.webRTC.sendEvent("request_battle");
 
+      this.webRTC.sendEvent("answer_state", { state: "sync" });
+
       this.on('remote_sync_start', () => {
         //疎通確認を行う
       });
