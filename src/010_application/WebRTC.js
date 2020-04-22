@@ -3,7 +3,7 @@ phina.namespace(function() {
   phina.define("WebRTC", {
     superClass: "phina.util.EventDispatcher",
 
-    key: '344539c4-13d8-4c29-86b1-ca96a66897f7',
+    key: "",
     id: "",
     peer: null,
     peerList: null,
@@ -11,7 +11,7 @@ phina.namespace(function() {
 
     isReady: false,
 
-    init: function(app) {
+    init: function(app, key) {
       this.superInit();
 
       this.app = app;
@@ -20,10 +20,7 @@ phina.namespace(function() {
       this.peerData = [];
       this.dataConnections = [];
 
-      this.peer = new Peer({
-        key: '344539c4-13d8-4c29-86b1-ca96a66897f7',
-        debug: 3,
-      });
+      this.peer = new Peer({ key, debug: 3 });
 
       const peer = this.peer;
       peer.once('open', id => {
@@ -69,7 +66,12 @@ phina.namespace(function() {
 
         const parseData = JSON.parse(data);
         if (parseData && parseData.eventName) {
-          this.app.currentScene.flare(parseData.eventName, { data: parseData.data });
+          const eventData = {
+            data: parseData.data,
+            dataConnection,
+          };
+          this.app.currentScene.flare(parseData.eventName, eventData);
+          this.app.flare(parseData.eventName, eventData);
         }
         // console.log(`from[${id}] data: ${data}`);
       });
@@ -108,7 +110,7 @@ phina.namespace(function() {
     },
 
     sendData: function(toPeerID, data) {
-      const dc = this.dataConnections[peerID];
+      const dc = this.dataConnections.find(e => e.remoteId == toPeerID);
       if (dc) {
         if (dc.open) {
           if (typeof data == "object") {

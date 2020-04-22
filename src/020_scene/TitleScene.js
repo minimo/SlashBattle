@@ -80,6 +80,13 @@ phina.namespace(function() {
       this.on('request_battle', () => {
         this.dialog = Dialog().addChildTo(this).open();
       });
+      this.on('answer_state', e => {
+        this.labelList.forEach(l => {
+          if (l.peer.text == e.dataConnection.remoteId) {
+            l.state.text = e.data.state;
+          }
+        });
+      });
 
       Label({ text: this.app.webRTC.id, fill: "white", fontSize: 16, baseline: "middle", align: "right" })
         .setPosition(SCREEN_WIDTH * 0.95, SCREEN_HEIGHT * 0.95)
@@ -89,7 +96,12 @@ phina.namespace(function() {
 
     setupPeerList: function() {
       //一覧ラベルを一旦解放
-      if (this.labelList) this.labelList.forEach(e => e.remove());
+      if (this.labelList) {
+        this.labelList.forEach(e => {
+          e.peer.remove();
+          e.state.remove();
+        });
+      }
       this.labelList = [];
 
       //一覧を作成
@@ -99,12 +111,18 @@ phina.namespace(function() {
         const peer = Label({ text: id, fill: "white", fontSize: 20, baseline: "middle", align: "left" })
           .setPosition(30, y)
           .addChildTo(this);
-        this.labelList.push(peer);
+        const state = Label({ text: "unknown", fill: "white", fontSize: 20, baseline: "middle", align: "left" })
+          .setPosition(300, y)
+          .addChildTo(this);
+        this.labelList.push({ peer, state });
+
         if (id != "Single play") {
           const dc = this.dcList.find(e => e.remoteId == id);
           if (!dc) {
             this.dcList.push(this.app.webRTC.createConnection(id));
           }
+        } else {
+          state.setVisible(false);
         }
         y += 25;
       });
@@ -118,6 +136,9 @@ phina.namespace(function() {
       this.selectNum = 0;
       this.beforeKey = {};
       this.isReady = true;
+
+      //各peerに現在ステートの問い合わせ
+      this.webRTC.sendEvent("request_state");
     },
 
     update: function() {
@@ -137,7 +158,7 @@ phina.namespace(function() {
           this.exit("main");
           this.closeAllPeers();
         } else {
-          const id = this.labelList[this.selectNum].text;
+          const id = this.labelList[this.selectNum].peer.text;
           this.isExit = true;
           this.exit("sync", { isSelect: true, remoteId: id });
         }

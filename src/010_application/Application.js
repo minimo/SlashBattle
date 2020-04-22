@@ -45,6 +45,15 @@ phina.namespace(function() {
       this.webRTC = null;
       this.setupWebRTC();
 
+      this.on('request_state', e => {
+        let state = "";
+        const currentScene = this.currentScene;
+        if (currentScene instanceof TitleScene) state = "title";
+        if (currentScene instanceof MainScene) state = "main";
+        if (currentScene instanceof SyncRemoteScene) state = "sync";
+        this.webRTC.sendEvent('answer_state', { state }, e.dataConnection.remoteId);
+      });
+
       this.state = "";
 
       //ページを閉じた場合にイベント発火
@@ -119,7 +128,7 @@ phina.namespace(function() {
 
     setupWebRTC: function() {
       if (this.webRTC) return;
-      this.webRTC = WebRTC(this);
+      this.webRTC = WebRTC(this, WEBRTC_API_KEY);
       this.remoteConnectionList = [];
     },
 

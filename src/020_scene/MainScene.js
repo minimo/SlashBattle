@@ -25,6 +25,7 @@ phina.namespace(function() {
         }
       });
 
+      //リモート側からクローズ通知を受けた
       this.on("webrtc_dataconnection_close", () => {
         if (!this.anotherPlayer) return;
         this.anotherPlayer.remove();

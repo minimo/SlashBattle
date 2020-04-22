@@ -3,6 +3,7 @@
  */
 
 phina.globalize();
+const WEBRTC_API_KEY = "b876a85f-f1b4-4412-bb13-cdac5986f0c1";
 
 const DEBUG_COLLISION = false;
 
