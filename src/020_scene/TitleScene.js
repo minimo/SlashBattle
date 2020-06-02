@@ -17,6 +17,7 @@ phina.namespace(function() {
       this.progress = 0;
       this.isExit = false;
       this.isReady = false;
+      this.isDialogOpen = false;
 
       //ロード済みならアセットロードをしない
       if (TitleScene.isAssetLoaded) {
@@ -61,7 +62,13 @@ phina.namespace(function() {
             data[index + 2] = 0;
         });
         phina.asset.AssetManager.set("image", key + "_mask", tex);
+
       });
+
+      //ID表示用レイヤー
+      this.menuLayer = DisplayElement().addChildTo(this);
+      //ダイアログ用レイヤー
+      this.dialogLayer = DisplayElement().addChildTo(this);
 
       //WebRTCメッセージ待ち受け
       setTimeout(this.setupPeerList.bind(this), 10);
@@ -77,8 +84,20 @@ phina.namespace(function() {
         this.webRTC.refreshPeerList()
           .then(() => this.setupPeerList());
       });
-      this.on('request_battle', () => {
-        this.dialog = Dialog().addChildTo(this).open();
+      this.on('request_battle', e => {
+        if (this.isDialogOpen) return;
+        const remoteId = e.data.id;
+        this.isDialogOpen = true;
+        console.log(`Battle request from ${remoteId}`);
+        ConnectRequestDialog({ id: remoteId })
+          .addChildTo(this.dialogLayer)
+          .open()
+          .on('ok', () => {
+            this.exit("sync", { remoteId, isRequest: false });
+            this.isExit = true;
+          })
+          .on('cancel', () => this.webRTC.sendEvent("request_battle_cancel", { id: this.webRTC.id }, remoteId))
+          .on('closed', () => this.isDialogOpen = false);
       });
       this.on('answer_state', e => {
         this.labelList.forEach(l => {
@@ -110,10 +129,10 @@ phina.namespace(function() {
       this.peerList.forEach(id => {
         const peer = Label({ text: id, fill: "white", fontSize: 20, baseline: "middle", align: "left" })
           .setPosition(30, y)
-          .addChildTo(this);
+          .addChildTo(this.menuLayer);
         const state = Label({ text: "unknown", fill: "white", fontSize: 20, baseline: "middle", align: "left" })
           .setPosition(300, y)
-          .addChildTo(this);
+          .addChildTo(this.menuLayer);
         this.labelList.push({ peer, state });
 
         if (id != "Single play") {
@@ -142,7 +161,7 @@ phina.namespace(function() {
     },
 
     update: function() {
-      if (!TitleScene.isAssetLoaded || this.isExit || !this.isReady) return;
+      if (!TitleScene.isAssetLoaded || this.isExit || !this.isReady || this.isDialogOpen) return;
 
       const ct = this.app.controller;
       if (ct.down && !this.beforeKey.down) {
@@ -158,9 +177,12 @@ phina.namespace(function() {
           this.exit("main");
           this.closeAllPeers();
         } else {
-          const id = this.labelList[this.selectNum].peer.text;
-          this.isExit = true;
-          this.exit("sync", { isSelect: true, remoteId: id });
+          const state = this.labelList[this.selectNum].state.text;
+          if (state == "title") {
+            const id = this.labelList[this.selectNum].peer.text;
+            this.isExit = true;
+            this.exit("sync", { remoteId: id, isRequest: true });
+          }
         }
       }
 

@@ -9,6 +9,7 @@ phina.namespace(function() {
       this.app.state = "main";
 
       this.anotherPlayer = null;
+      this.remoteId = options.remoteId;
 
       this.on('playerdata', e => {
         const data = e.data;
@@ -72,7 +73,7 @@ phina.namespace(function() {
       data.x = this.player.x;
       data.y = this.player.y;
       data.scaleX = this.player.sprite.scaleX;
-      this.app.webRTC.sendEvent("playerdata", data);
+      this.app.webRTC.sendEvent("playerdata", data, this.remoteId);
     },
 
   });
