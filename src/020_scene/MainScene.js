@@ -5,11 +5,13 @@ phina.namespace(function() {
 
     init: function(options) {
       this.superInit();
-      this.setup();
-      this.app.state = "main";
 
+      this.app.state = "main";
       this.anotherPlayer = null;
       this.remoteId = options.remoteId;
+      this.isHost = options.isRequest;
+
+      this.setup();
 
       this.on('playerdata', e => {
         const data = e.data;
@@ -35,10 +37,6 @@ phina.namespace(function() {
     },
 
     setup: function() {
-      // const back = RectangleShape({ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, fill: "black" })
-      //   .setPosition(SCREEN_WIDTH_HALF, SCREEN_HEIGHT_HALF)
-      //   .addChildTo(this);
-      // this.registDispose(back);
       this.back = Sprite("back")
         .setOrigin(0, 0)
         .setScale(1.5)
@@ -59,9 +57,12 @@ phina.namespace(function() {
         .setPosition(0, -250)
         .addChildTo(this.layers[LAYER_MAP]);
 
-      this.player = Player(this)
-        .addChildTo(this.layers[LAYER_PLAYER])
-        .setPosition(500, 100);
+      this.player = Player(this).addChildTo(this.layers[LAYER_PLAYER])
+      if (this.isHost) {
+          this.player.setPosition(100, 100);
+        } else {
+          this.player.setPosition(400, 100);
+        }
 
       Label({ text: "▼", fill: "white", fontSize: 8 })
         .addChildTo(this.player)

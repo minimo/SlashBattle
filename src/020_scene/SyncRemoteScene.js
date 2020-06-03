@@ -17,13 +17,16 @@ phina.namespace(function() {
 
       this.webRTC = this.app.webRTC;
 
-      if (options.isRequest) {
-        console.log(`Battle request for ${options.remoteId}`);
-        this.webRTC.sendEvent("request_battle", { id: this.webRTC.id }, options.remoteId);
+      const remoteId = options.remoteId;
+      const isRequest = options.isRequest;
+
+      if (isRequest) {
+        console.log(`Battle request for ${remoteId}`);
+        this.webRTC.sendEvent("request_battle", { id: this.webRTC.id }, remoteId);
         this.state = "wait";
       } else {
-        console.log(`Battle request for ${options.remoteId}`);
-        this.webRTC.sendEvent("remote_sync_start", { id: this.webRTC.id }, options.remoteId);
+        console.log(`Battle request for ${remoteId}`);
+        this.webRTC.sendEvent("remote_sync_start", { id: this.webRTC.id }, remoteId);
         this.state = "sync";
        }
 
@@ -31,16 +34,16 @@ phina.namespace(function() {
 
       this.on('remote_sync_start', () => {
         //疎通確認を行う
-        if (options.isRequest) {
-          this.webRTC.sendEvent("remote_sync_start", { id: this.webRTC.id }, options.remoteId);
+        if (isRequest) {
+          this.webRTC.sendEvent("remote_sync_start", { id: this.webRTC.id }, remoteId);
         }
-        this.webRTC.sendEvent("remote_sync_ok", { id: this.webRTC.id }, options.remoteId);
+        this.webRTC.sendEvent("remote_sync_ok", { id: this.webRTC.id }, remoteId);
         this.state = "sync";
       });
 
       this.on('remote_sync_ok', () => {
         console.log("remote sync ok");
-        setTimeout(() => this.exit("main", { remoteId: options.remoteId }), 100);
+        setTimeout(() => this.exit("main", { remoteId, isRequest }), 100);
       });
 
       //接続キャンセル
@@ -89,9 +92,10 @@ phina.namespace(function() {
       }
 
       this.indicater.text = "";
-      const c = Math.floor((this.time / 60) % 11);
-      c.times(() => this.indicater.text += ".");
-
+      if (this.state == "wait") {
+        const c = Math.floor((this.time / 60) % 11);
+        c.times(() => this.indicater.text += ".");
+      }
       this.time++;
     },
 
