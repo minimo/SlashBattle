@@ -52,6 +52,8 @@ phina.namespace(function() {
       //レイヤーショートカット
       this.playerLayer = this.layers[LAYER_PLAYER];
       this.enemyLayer = this.layers[LAYER_ENEMY];
+      this.objectLayer = this.layers[LAYER_OBJECT];
+      this.collisionLayer = this.layers[LAYER_COLLISION];
       
       this.map = WorldMap("map1")
         .setPosition(0, -250)

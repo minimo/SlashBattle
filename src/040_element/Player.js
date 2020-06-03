@@ -65,7 +65,7 @@ phina.define("Player", {
     this.weapon.type = "sword";
 
     //攻撃判定用
-    this.attackCollision = phina.display.DisplayElement({width: 14, height: 26});
+    this.attackCollision = phina.display.RectangleShape({width: 14, height: 26});
 
     //当たり判定デバッグ用
     if (DEBUG_COLLISION) {

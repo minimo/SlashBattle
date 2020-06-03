@@ -1,6 +1,6 @@
 phina.namespace(function() {
   phina.define("BaseCharacter", {
-  superClass: "phina.display.DisplayElement",
+  superClass: "DisplayElement",
 
     //マップオブジェクトID
     id: -1,
@@ -132,14 +132,14 @@ phina.namespace(function() {
       if (Math.abs(this.vy) < 0.01) this.vy = 0;
 
       if (this.y > 300) {
-        this.isOnFloor = true;
-        this.isJump = false;
-        this.vy = 0;
-        this.y = 300;
+        // this.isOnFloor = true;
+        // this.isJump = false;
+        // this.vy = 0;
+        // this.y = 300;
       }
 
-      // this.resetCollisionPosition();
-      // this.checkMapCollision();
+      this.resetCollisionPosition();
+      this.checkMapCollision();
 
       //アニメーション
       if (this.sprite && this.isAnimation && this.isAdvanceAnimation && this.time % this.animationInterval == 0) {
@@ -207,24 +207,24 @@ phina.namespace(function() {
 
       //当たり判定デバッグ用
       if (DEBUG_COLLISION) {
-      this.one('enterframe', e => {
-        this._collision[0].addChildTo(this.parentScene.objLayer);
-        this._collision[1].addChildTo(this.parentScene.objLayer);
-        this._collision[2].addChildTo(this.parentScene.objLayer);
-        this._collision[3].addChildTo(this.parentScene.objLayer);
-        this._collision[0].alpha = 0.3;
-        this._collision[1].alpha = 0.3;
-        this._collision[2].alpha = 0.3;
-        this._collision[3].alpha = 0.3;
-        //ダメージ当たり判定表示
-        var c = phina.display.RectangleShape({width: this.width, height: this.height}).addChildTo(this);
-        c.alpha = 0.3;
-      });
-      this.one('removed', e => {
-        this._collision[0].remove();
-        this._collision[1].remove();
-        this._collision[2].remove();
-        this._collision[3].remove();
+        this.one('enterframe', e => {
+          this._collision[0].addChildTo(this.parentScene.objectLayer);
+          this._collision[1].addChildTo(this.parentScene.objectLayer);
+          this._collision[2].addChildTo(this.parentScene.objectLayer);
+          this._collision[3].addChildTo(this.parentScene.objectLayer);
+          this._collision[0].alpha = 0.3;
+          this._collision[1].alpha = 0.3;
+          this._collision[2].alpha = 0.3;
+          this._collision[3].alpha = 0.3;
+          //ダメージ当たり判定表示
+          var c = phina.display.RectangleShape({width: this.width, height: this.height}).addChildTo(this);
+          c.alpha = 0.3;
+        });
+        this.one('removed', e => {
+          this._collision[0].remove();
+          this._collision[1].remove();
+          this._collision[2].remove();
+          this._collision[3].remove();
         });
       }
       return this;
