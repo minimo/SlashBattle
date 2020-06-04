@@ -15,12 +15,13 @@ const SCREEN_HEIGHT_HALF = SCREEN_HEIGHT * 0.5;
 const SCREEN_OFFSET_X = 0;
 const SCREEN_OFFSET_Y = 0;
 
-const NUM_LAYERS = 7;
-const LAYER_FOREGROUND = 6;
-const LAYER_OBJECT = 5;
+const NUM_LAYERS = 8;
+const LAYER_FOREGROUND = 7;
+const LAYER_DEBUG = 6;
+const LAYER_COLLISION = 5;
 const LAYER_ENEMY = 4;
 const LAYER_PLAYER = 3;
-const LAYER_COLLISION = 2;
+const LAYER_OBJECT = 2;
 const LAYER_BACKGROUND = 1;
 const LAYER_MAP = 0;
 

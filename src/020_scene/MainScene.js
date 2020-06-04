@@ -42,7 +42,7 @@ phina.namespace(function() {
         .setScale(1.5)
         .addChildTo(this);
 
-      this.base = DisplayElement().addChildTo(this);
+      this.base = DisplayElement().addChildTo(this).setPosition(-50, -250);
 
       this.layers = [];
       (NUM_LAYERS).times(i => {
@@ -54,29 +54,42 @@ phina.namespace(function() {
       this.enemyLayer = this.layers[LAYER_ENEMY];
       this.objectLayer = this.layers[LAYER_OBJECT];
       this.collisionLayer = this.layers[LAYER_COLLISION];
-      
-      this.map = WorldMap("map1")
-        .setPosition(0, -250)
-        .addChildTo(this.layers[LAYER_MAP]);
+      this.debugLayer = this.layers[LAYER_DEBUG];
 
+      //マップ作成
+      this.map = WorldMap("map1")
+        .setPosition(0, 0)
+        .addChildTo(this.layers[LAYER_MAP]);
+      this.map.getCollisionData().forEach(e => e.addChildTo(this.collisionLayer));
+
+      //プレイヤー
       this.player = Player(this).addChildTo(this.layers[LAYER_PLAYER])
       if (this.isHost) {
-          this.player.setPosition(100, 100);
+          this.player.setPosition(300, 100);
         } else {
-          this.player.setPosition(400, 100);
+          this.player.setPosition(150, 100);
         }
-
-      Label({ text: "▼", fill: "white", fontSize: 8 })
+      //識別サイン
+      this.player.sign = Label({ text: "▼", fill: "white", fontSize: 8 })
         .addChildTo(this.player)
-        .setPosition(0, -20);
+        .setPosition(0, -25);
+      this.player.sign.tweener.clear()
+        .to({ y: -20 }, 1000)
+        .set({ y: -25 })
+        .setLoop(true);
     },
 
     update: function() {
-      const data = this.app.controller;
-      data.x = this.player.x;
-      data.y = this.player.y;
-      data.scaleX = this.player.sprite.scaleX;
-      this.app.webRTC.sendEvent("playerdata", data, this.remoteId);
+      this.base.x = SCREEN_WIDTH * 0.5 - this.player.x;
+      this.base.y = SCREEN_HEIGHT * 0.5 - this.player.y;
+
+      if (this.remoteId) {
+        const data = this.app.controller;
+        data.x = this.player.x;
+        data.y = this.player.y;
+        data.scaleX = this.player.sprite.scaleX;
+        this.app.webRTC.sendEvent("playerdata", data, this.remoteId);
+      }
     },
 
   });

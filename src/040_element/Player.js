@@ -92,7 +92,7 @@ phina.define("Player", {
     this.reset();
 
     //はしご接触判定用
-    this.ladderCollision = phina.display.RectangleShape({width: 16, height: 20});
+    this.ladderCollision = DisplayElement({ width: 16, height: 20 });
     
     this.before = {
       //操作系
@@ -139,18 +139,7 @@ phina.define("Player", {
 
       //上キー押下
       if (ct.up || ct.jump) {
-        //ジャンプ二段目以降
-        if (this.isJump && this.numJump < this.numJumpMax && this.vy > -(this.jumpPower / 2)) {
-            this.vy = -this.jumpPower;
-            this.numJump++;
-        }
-        //ジャンプ
-        if (!this.isJump && this.isOnFloor && !this.isOnLadder) {
-            this.setAnimation("jump");
-            this.isJump = true;
-            this.vy = -this.jumpPower;
-            this.numJump = 1;
-        }
+        this.jump();
       }
     }
 
@@ -221,6 +210,21 @@ phina.define("Player", {
     this.before.inOnFloor = this.isOnFloor;
     this.before.x = this.x;
     this.before.y = this.y;
+  },
+
+  jump: function() {
+    //ジャンプ二段目以降
+    if (!this.before.jump && this.isJump && this.numJump < this.numJumpMax && this.vy > -(this.jumpPower / 2)) {
+      this.vy = -this.jumpPower;
+      this.numJump++;
+    }
+    //ジャンプ
+    if (!this.isJump && this.isOnFloor && !this.isOnLadder) {
+        this.setAnimation("jump");
+        this.isJump = true;
+        this.vy = -this.jumpPower;
+        this.numJump = 1;
+    }
   },
 
   //プレイヤー情報リセット

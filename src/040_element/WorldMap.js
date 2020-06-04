@@ -32,20 +32,14 @@ phina.namespace(function() {
       const result = [];
       const layerData = this.data.getObjectGroup(layerName);
       layerData.objects.forEach(e => {
-        const element = DisplayElement({
+        const element = RectangleShape({
           width: e.width,
           height: e.height,
           x: e.x + e.width * 0.5,
           y: e.y + e.height * 0.5,
-        }).addChildTo(this);
+        });
+        element.alpha = DEBUG_COLLISION ? 0.3 : 0;
         element.$extend(e.properties);
-        if (e.properties.floorNumber) {
-          const list = e.properties.floorNumber.split(',');
-          element.floorNumber = [];
-          (10).times(i => {
-            element.floorNumber[i] = list.indexOf(i + "") !== -1 ? true : false;
-          })
-        }
         result.push(element);
       });
       return result;

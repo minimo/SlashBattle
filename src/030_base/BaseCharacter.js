@@ -74,7 +74,7 @@ phina.namespace(function() {
     ignoreCollision: false,
 
     //スクリーン内フラグ
-    onScreen: false,
+    isOnScreen: true,
 
     //活動フラグ
     isActive: true,
@@ -131,15 +131,15 @@ phina.namespace(function() {
       if (Math.abs(this.vx) < 0.01) this.vx = 0;
       if (Math.abs(this.vy) < 0.01) this.vy = 0;
 
-      if (this.y > 300) {
-        // this.isOnFloor = true;
-        // this.isJump = false;
-        // this.vy = 0;
-        // this.y = 300;
-      }
-
       this.resetCollisionPosition();
       this.checkMapCollision();
+
+      // if (this.y > 300) {
+      //   this.isOnFloor = true;
+      //   this.isJump = false;
+      //   this.vy = 0;
+      //   this.y = 300;
+      // }
 
       //アニメーション
       if (this.sprite && this.isAnimation && this.isAdvanceAnimation && this.time % this.animationInterval == 0) {
@@ -189,13 +189,13 @@ phina.namespace(function() {
     //当たり判定情報初期化
     initCollision: function(options) {
       //当り判定用（0:上 1:右 2:下 3:左）
-      var w = Math.floor(this.width/4);
-      var h = Math.floor(this.height/4);
+      const w = Math.floor(this.width / 4);
+      const h = Math.floor(this.height / 4);
       this._collision = [];
-      this._collision[0] = phina.display.RectangleShape({width: w, height: 2});
-      this._collision[1] = phina.display.RectangleShape({width: 2, height: h});
-      this._collision[2] = phina.display.RectangleShape({width: w, height: 2});
-      this._collision[3] = phina.display.RectangleShape({width: 2, height: h});
+      this._collision[0] = DisplayElement({ width: w, height: 2 });
+      this._collision[1] = DisplayElement({ width: 2, height: h });
+      this._collision[2] = DisplayElement({ width: w, height: 2 });
+      this._collision[3] = DisplayElement({ width: 2, height: h });
       this.collisionResult = null;
 
       //当たり判定チェック位置オフセット
@@ -205,28 +205,34 @@ phina.namespace(function() {
       //当たり判定情報再設定
       this.setupCollision();
 
+      this._collision[0].addChildTo(this.parentScene.debugLayer);
+      this._collision[1].addChildTo(this.parentScene.debugLayer);
+      this._collision[2].addChildTo(this.parentScene.debugLayer);
+      this._collision[3].addChildTo(this.parentScene.debugLayer);
+
       //当たり判定デバッグ用
       if (DEBUG_COLLISION) {
         this.one('enterframe', e => {
-          this._collision[0].addChildTo(this.parentScene.objectLayer);
-          this._collision[1].addChildTo(this.parentScene.objectLayer);
-          this._collision[2].addChildTo(this.parentScene.objectLayer);
-          this._collision[3].addChildTo(this.parentScene.objectLayer);
           this._collision[0].alpha = 0.3;
           this._collision[1].alpha = 0.3;
           this._collision[2].alpha = 0.3;
           this._collision[3].alpha = 0.3;
           //ダメージ当たり判定表示
-          var c = phina.display.RectangleShape({width: this.width, height: this.height}).addChildTo(this);
+          var c = RectangleShape({ width: this.width, height: this.height }).addChildTo(this);
           c.alpha = 0.3;
         });
-        this.one('removed', e => {
-          this._collision[0].remove();
-          this._collision[1].remove();
-          this._collision[2].remove();
-          this._collision[3].remove();
-        });
-      }
+        // this.one('removed', e => {
+        //   this._collision[0].remove();
+        //   this._collision[1].remove();
+        //   this._collision[2].remove();
+        //   this._collision[3].remove();
+        // });
+      } else {
+        this._collision[0].alpha = 0.0;
+        this._collision[1].alpha = 0.0;
+        this._collision[2].alpha = 0.0;
+        this._collision[3].alpha = 0.0;
+    }
       return this;
     },
     //地形当たり判定
@@ -241,7 +247,7 @@ phina.namespace(function() {
       this.isOnLadder = false;
       this.isOnStairs = false;
 
-      if (this.onScreen && this.shadowSprite) {
+      if (this.isOnScreen && this.shadowSprite) {
         this.shadowY = 99999;
         var p1 = phina.geom.Vector2(this.x, this.y);
         var p2 = phina.geom.Vector2(this.x, this.y + 128);
@@ -263,16 +269,17 @@ phina.namespace(function() {
         //左側
         if (this.vx < 0  && e.hitTestElement(this._collision[3])) this._collision[3].hit = e;
 
-        if (this.onScreen && this.shadowSprite) {
+        //影を落とす
+        if (this.isOnScreen && this.shadowSprite) {
             //キャラクターの下方向にレイを飛ばして直下の地面座標を取る
             var x = e.x - e.width / 2;
             var y = e.y - e.height / 2;
-            var p3 = phina.geom.Vector2(x, y);
-            var p4 = phina.geom.Vector2(x + e.width, y);
+            var p3 = Vector2(x, y);
+            var p4 = Vector2(x + e.width, y);
             if (y < this.shadowY && phina.geom.Collision.testLineLine(p1, p2, p3, p4)) {
-            this.shadowSprite.setPosition(this.x, y);
-            this.shadowSprite.visible = true;
-            this.shadowY = y;
+              this.shadowSprite.setPosition(this.x, y);
+              this.shadowSprite.visible = true;
+              this.shadowY = y;
             }
         }
       });
@@ -364,14 +371,14 @@ phina.namespace(function() {
       y = y || this.y;
       width = width || 1;
       height = height || 1;
-      var c = phina.display.DisplayElement({width: width, height: height}).setPosition(x, y);
-      var ret = null;
+      const c = DisplayElement({ width, height }).setPosition(x, y);
+      let ret = null;
       this.parentScene.collisionLayer.children.forEach(function(e) {
-      if (e.type == "ladder" || e.type == "stairs") return;
-      if (e.hitTestElement(c)) {
-        if (ret == null) ret = [];
-        ret.push(e);
-      }
+        if (e.type == "ladder" || e.type == "stairs") return;
+        if (e.hitTestElement(c)) {
+          if (ret == null) ret = [];
+          ret.push(e);
+        }
       });
       return ret;
     },
@@ -381,49 +388,48 @@ phina.namespace(function() {
       if (this.ignoreCollision) return;
       if (this.isDrop) return;
 
-      var ret = [];
-      var that = this;
-      this.parentScene.objLayer.children.forEach(function(e) {
+      const ret = [];
+      this.parentScene.objLayer.children.forEach(e => {
         if (!e.isBlock) return;
         if (e.isDead) return;
 
         //上側
-        if (that.vy < 0 && e.hitTestElement(that._collision[0])) {
-          that.y = e.y+e.height*(1-e.originY)+16;
-          that.vy = 1;
+        if (this.vy < 0 && e.hitTestElement(this._collision[0])) {
+          this.y = e.y + e.height * (1 - e.originY) + 16;
+          this.vy = 1;
           ret[0] = e;
-          that.resetCollisionPosition();
+          this.resetCollisionPosition();
         }
         //下側
-        if (that.vy > 0 && e.hitTestElement(that._collision[2])) {
-          that.y = e.y - e.height * e.originY - 16;
-          that.vx = e.vx;
-          that.vy = 0;
-          that.isJump = false;
-          that.isOnFloor = true;
-          that.throughFloor = null;
+        if (this.vy > 0 && e.hitTestElement(this._collision[2])) {
+          this.y = e.y - e.height * e.originY - 16;
+          this.vx = e.vx;
+          this.vy = 0;
+          this.isJump = false;
+          this.isOnFloor = true;
+          this.throughFloor = null;
           ret[2] = e;
-          if (that.rebound > 0) {
-          that.isJump = true;
-          that.vy = -that.vy * that.rebound;
+          if (this.rebound > 0) {
+            this.isJump = true;
+            this.vy = -this.vy * this.rebound;
           } else {
-          that.vy = 0;
+            this.vy = 0;
           }
-          that.resetCollisionPosition();
+          this.resetCollisionPosition();
         }
         //右側
-        if (that.vx > 0 && e.hitTestElement(that._collision[1])) {
-            that.x = e.x - e.width * e.originX - 10;
-            that.vx = 0;
+        if (this.vx > 0 && e.hitTestElement(this._collision[1])) {
+            this.x = e.x - e.width * e.originX - 10;
+            this.vx = 0;
             ret[1] = e;
-            that.resetCollisionPosition();
+            this.resetCollisionPosition();
         }
         //左側
-        if (that.vx < 0 && e.hitTestElement(that._collision[3])) {
-            that.x = e.x + e.width * (1 - e.originX) + 10;
-            that.vx = 0;
+        if (this.vx < 0 && e.hitTestElement(this._collision[3])) {
+            this.x = e.x + e.width * (1 - e.originX) + 10;
+            this.vx = 0;
             ret[3] = e;
-            that.resetCollisionPosition();
+            this.resetCollisionPosition();
         }
       });
       return ret;
@@ -436,8 +442,8 @@ phina.namespace(function() {
 
     //当たり判定用エレメントの位置再セット
     resetCollisionPosition: function() {
-      var w = Math.floor(this.width/2) + 6 + this.offsetCollisionX;
-      var h = Math.floor(this.height/2)+ 6 + this.offsetCollisionY;
+      var w = Math.floor(this.width / 2) + 6 + this.offsetCollisionX;
+      var h = Math.floor(this.height / 2)+ 6 + this.offsetCollisionY;
       this._collision[0].setPosition(this.x, this.y - h);
       this._collision[1].setPosition(this.x + w, this.y);
       this._collision[2].setPosition(this.x, this.y + h);
