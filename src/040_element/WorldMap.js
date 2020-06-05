@@ -39,6 +39,8 @@ phina.namespace(function() {
           y: e.y + e.height * 0.5,
         });
         element.alpha = DEBUG_COLLISION ? 0.3 : 0;
+        element.type = e.type;
+        element.id = e.id;
         element.$extend(e.properties);
         result.push(element);
       });

@@ -123,23 +123,20 @@ phina.namespace(function() {
         this.vx *= this.friction;
       }
 
-      this.y += this.vy;
-      this.vy += this.gravity;
-      //落下速度上限
-      if (this.vy > 20) this.vy = 20;
-
+      if (this.isCatchLadder) {
+        this.y += this.vy;
+        this.vy = 0;
+      } else {
+          this.y += this.vy;
+          this.vy += this.gravity;
+          //落下速度上限
+          if (this.vy > 20) this.vy = 20;
+      }
       if (Math.abs(this.vx) < 0.01) this.vx = 0;
       if (Math.abs(this.vy) < 0.01) this.vy = 0;
 
       this.resetCollisionPosition();
       this.checkMapCollision();
-
-      // if (this.y > 300) {
-      //   this.isOnFloor = true;
-      //   this.isJump = false;
-      //   this.vy = 0;
-      //   this.y = 300;
-      // }
 
       //アニメーション
       if (this.sprite && this.isAnimation && this.isAdvanceAnimation && this.time % this.animationInterval == 0) {
@@ -284,7 +281,7 @@ phina.namespace(function() {
         }
       });
 
-      if (this.isCatchLadder) this.shadowSprite.visible = false;
+      if (this.shadowSprite && this.isCatchLadder) this.shadowSprite.visible = false;
 
       //当たり判定結果反映
       this.collisionProcess();

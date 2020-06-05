@@ -92,7 +92,7 @@ phina.define("Player", {
     this.reset();
 
     //はしご接触判定用
-    this.ladderCollision = DisplayElement({ width: 16, height: 20 });
+    this.ladderCollision = DisplayElement({ width: 16, height: 20 }).addChildTo(this.parentScene.debugLayer);
     
     this.before = {
       //操作系
@@ -127,21 +127,94 @@ phina.define("Player", {
       //左移動
       if (ct.left && !ct.down) {
         if (!this.isJump && !this.isAttack && !this.isCatchLadder) this.setAnimation("walk");
-        this.scaleX = -1;
-        this.vx = -this.speed;
+        //はしご掴み状態で左に壁がある場合は不可
+        var c = this._collision[3];
+        if (!(this.isCatchLadder && this.checkMapCollision2(c.x + 6, c.y, c.width, c.height))) {
+          this.scaleX = -1;
+          this.vx = -this.speed;
+        }
       }
       //右移動
       if (ct.right && !ct.down) {
         if (!this.isJump && !this.isAttack && !this.isCatchLadder) this.setAnimation("walk");
-        this.scaleX = 1;
-        this.vx = this.speed;
+        //はしご掴み状態で右に壁がある場合は不可
+        var c = this._collision[1];
+        if (!(this.isCatchLadder && this.checkMapCollision2(c.x - 6, c.y, c.width, c.height))) {
+          this.scaleX = 1;
+          this.vx = this.speed;
+        }
       }
 
-      //上キー押下
-      if (ct.up || ct.jump) {
-        this.jump();
+      //頭上足元はしご検知
+      const isHeadLadder = this.checkLadder(true);
+      const isFootLadder = this.checkLadder(false);
+
+      //はしご掴み状態で操作分岐
+      if (this.isCatchLadder) {
+        if (ct.up) {
+          this.vx = 0;
+          this.vy = -this.speedAscend;
+          var c = this._collision[0];
+          if (!isHeadLadder && this.checkMapCollision2(c.x, c.y-6, c.width, c.height)) {
+            this.vy = 0;
+          }
+        }
+        if (ct.down) {
+          this.vx = 0;
+          this.vy = this.speedAscend;
+        }
+      } else {
+        //ジャンプボタンのみ
+        if (ct.jump && !ct.up) {
+          this.jump(false);
+        }
+        //上キー押下
+        if (ct.up) {
+          this.jump(true);
+          //はしごを昇る（階段は接地時のみ）
+          if (this.isOnLadder && !this.isOnStairs || this.isOnFloor && this.isOnStairs) {
+            this.setAnimation("up");
+            this.vx = 0;
+            this.vy = 0;
+            this.isCatchLadder = true;
+            this.throughFloor = null;
+          }
+          //扉に入る（接地時＆左右キーオフ時のみ）
+          if (!ct.left && !ct.right && this.isOnFloor && this.isOnDoor && !this.isOnDoor.isLock && !this.isOnDoor.already) {
+            this.vx = 0;
+            this.vy = 0;
+            this.isOnDoor.flare('enterdoor');
+            this.isOnDoor.already = false;
+          }
+        }
+        //下キー押下
+        if (ct.down) {
+          //はしごを降りる
+          if (isFootLadder) {
+            this.setAnimation("up");
+            this.vx = 0;
+            this.vy = 0;
+            this.isCatchLadder = true;
+            this.throughFloor = null;
+          }
+          //床スルー
+          if (this.downFrame > 6 && !this.jump && !isFootLadder) {
+            if (this.isOnFloor && !this.throughFloor) {
+              const floor = this.checkMapCollision2(this.x, this.y + 16, 5, 5);
+              if (floor && floor[0].enableThrough) this.throughFloor = floor[0];
+            }
+          }
+        }
+      }
+
+      //はしごから外れたら梯子掴み状態キャンセル
+      if (this.isCatchLadder) {
+        if (!this.isOnLadder && !ct.down || this.isOnLadder && !isFootLadder && !ct.up) {
+          this.isCatchLadder = false;
+        }
       }
     }
+
 
     //攻撃
     if (!this.isAttack) {
@@ -212,18 +285,20 @@ phina.define("Player", {
     this.before.y = this.y;
   },
 
-  jump: function() {
+  jump: function(isUp) {
     //ジャンプ二段目以降
     if (!this.before.jump && this.isJump && this.numJump < this.numJumpMax && this.vy > -(this.jumpPower / 2)) {
       this.vy = -this.jumpPower;
       this.numJump++;
     }
     //ジャンプ
-    if (!this.isJump && this.isOnFloor && !this.isOnLadder) {
-        this.setAnimation("jump");
-        this.isJump = true;
-        this.vy = -this.jumpPower;
-        this.numJump = 1;
+    const chk = this.checkMapCollision2(this.x, this.y-16, 5, 3);
+    const res = isUp ? !this.isJump && this.isOnFloor && !this.isOnLadder && !chk : !this.isJump && this.isOnFloor && !chk;
+    if (res) {
+      this.setAnimation("jump");
+      this.isJump = true;
+      this.vy = -this.jumpPower;
+      this.numJump = 1;
     }
   },
 
@@ -501,6 +576,19 @@ phina.define("Player", {
     this._collision[3].setPosition(this.x - w, this.y - 5);
     this.ladderCollision.setPosition(this.x, this.y);
     return this;
+  },
+
+  //頭上はしごチェック
+  checkLadder: function(isHead) {
+    const h = Math.floor(this.height / 2) + 10 * isHead ? -1 : 1;
+    const c = DisplayElement({ width: 16, height: 2 }).setPosition(this.x, this.y + h);
+    let ret = null;
+    this.parentScene.collisionLayer.children.forEach(e => {
+      if (e.hitTestElement(c)) {
+        if (e.type == "ladder" || e.type == "stairs") ret = e;
+      }
+    });
+    return ret;
   },
 
   setControlData: function(data) {

@@ -21,11 +21,12 @@ phina.namespace(function() {
             .addChildTo(this.layers[LAYER_ENEMY])
             .setPosition(data.x, data.y);
           this.anotherPlayer.isRemotePlayer = true;
-        } else {
-          this.anotherPlayer.setControlData(data);
-          this.anotherPlayer.setPosition(data.x, data.y);
-          this.anotherPlayer.sprite.scaleX = data.scaleX;
         }
+        this.anotherPlayer.setControlData(data);
+        this.anotherPlayer.setPosition(data.x, data.y);
+        this.anotherPlayer.sprite.scaleX = data.scaleX;
+        this.anotherPlayer.hp = this.anotherPlayer.hp;
+        this.anotherPlayer.hpMax = this.anotherPlayer.hpMax;
       });
 
       //リモート側からクローズ通知を受けた
@@ -77,6 +78,37 @@ phina.namespace(function() {
         .to({ y: -20 }, 1000)
         .set({ y: -25 })
         .setLoop(true);
+
+      //体力ゲージ
+      const labelParam = {
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+        align: "left",
+        baseline: "middle",
+        fontSize: 20,
+        fontWeight: ''
+      };
+      this.lifeGaugeLabel = Label({ text: "LIFE" }.$safe(labelParam)).addChildTo(this).setPosition(0, 10);
+      const options = {
+        width:  200,
+        height: 5,
+        backgroundColor: 'transparent',
+        fill: 'red',
+        stroke: 'white',
+        strokeWidth: 2,
+        gaugeColor: 'lime',
+        cornerRadius: 0,
+        value: this.player.hp,
+        maxValue: this.player.hpMax,
+      };
+      this.lifeGauge = phina.ui.Gauge(options).addChildTo(this).setOrigin(0, 0.5).setPosition(40, 10);
+      const player = this.player;
+      this.lifeGauge.update = function() {
+        this.value = player.hp;
+        this.width = player.hpMax * 2;
+        this.maxValue = player.hpMax;
+      };
     },
 
     update: function() {
@@ -88,6 +120,8 @@ phina.namespace(function() {
         data.x = this.player.x;
         data.y = this.player.y;
         data.scaleX = this.player.sprite.scaleX;
+        data.hp = this.player.hp;
+        data.hpMax = this.player.hpMax;
         this.app.webRTC.sendEvent("playerdata", data, this.remoteId);
       }
     },
