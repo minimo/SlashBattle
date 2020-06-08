@@ -302,14 +302,14 @@ phina.namespace(function() {
 
     //当たり判定結果反映処理
     collisionProcess: function() {
-      var w = Math.floor(this.width/2)+6;
-      var h = Math.floor(this.height/2)+6;
+      var w = Math.floor(this.width / 2) + 6;
+      var h = Math.floor(this.height / 2) + 6;
       this.isOnFloor = false;
 
       //上側接触
       if (this._collision[0].hit && !this.isCatchLadder) {
         var ret = this._collision[0].hit;
-        this.y = ret.y+ret.height*(1-ret.originY)+h;
+        this.y = ret.y + ret.height * (1 - ret.originY) + h;
         this.vy = 0;
         this.resetCollisionPosition();
         if (ret.collisionScript) {
@@ -319,7 +319,7 @@ phina.namespace(function() {
       //下側接触
       if (this._collision[2].hit && !this.isCatchLadder) {
         var ret = this._collision[2].hit;
-        this.y = ret.y-ret.height*ret.originY-h;
+        this.y = ret.y - ret.height * ret.originY - h;
         this.x += ret.vx || 0;
         if (!this.isPlayer && ret.vy > 0) this.y += ret.vy || 0;
 
@@ -342,7 +342,7 @@ phina.namespace(function() {
       //右側接触
       if (this._collision[1].hit && !this.isCatchLadder) {
         var ret = this._collision[1].hit;
-        this.x = ret.x-ret.width*ret.originX-w;
+        this.x = ret.x - ret.width * ret.originX - w;
         this.vx = 0;
         this.resetCollisionPosition();
         if (ret.collisionScript) {
@@ -368,7 +368,7 @@ phina.namespace(function() {
       y = y || this.y;
       width = width || 1;
       height = height || 1;
-      const c = DisplayElement({ width, height }).setPosition(x, y);
+      const c = DisplayElement({ width, height }).setPosition(x, y).addChildTo(this.parentScene.debugLayer);
       let ret = null;
       this.parentScene.collisionLayer.children.forEach(function(e) {
         if (e.type == "ladder" || e.type == "stairs") return;
@@ -377,6 +377,7 @@ phina.namespace(function() {
           ret.push(e);
         }
       });
+      c.remove();
       return ret;
     },
 
