@@ -45,6 +45,7 @@ phina.namespace(function() {
 
       this.base = DisplayElement().addChildTo(this).setPosition(-50, -250);
 
+      //レイヤー準備
       this.layers = [];
       (NUM_LAYERS).times(i => {
         const layer = DisplayElement().addChildTo(this.base)
@@ -61,7 +62,21 @@ phina.namespace(function() {
       this.map = WorldMap("map1")
         .setPosition(0, 0)
         .addChildTo(this.layers[LAYER_MAP]);
+
+      //当たり判定
       this.map.getCollisionData().forEach(e => e.addChildTo(this.collisionLayer));
+
+      //オブジェクト
+      this.map.getObjectData().forEach(e => {
+        switch (e.type) {
+          case "itembox":
+            ItemBox(this, e)
+              .setPosition(e.x, e.y)
+              .addChildTo(this.objectLayer);
+            break;
+        }
+        e.addChildTo(this.objectLayer);
+      });
 
       //プレイヤー
       this.player = Player(this).addChildTo(this.layers[LAYER_PLAYER])

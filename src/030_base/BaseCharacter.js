@@ -127,10 +127,10 @@ phina.namespace(function() {
         this.y += this.vy;
         this.vy = 0;
       } else {
-          this.y += this.vy;
-          this.vy += this.gravity;
-          //落下速度上限
-          if (this.vy > 20) this.vy = 20;
+        this.y += this.vy;
+        this.vy += this.gravity;
+        //落下速度上限
+        if (this.vy > 20) this.vy = 20;
       }
       if (Math.abs(this.vx) < 0.01) this.vx = 0;
       if (Math.abs(this.vy) < 0.01) this.vy = 0;
@@ -218,12 +218,12 @@ phina.namespace(function() {
           var c = RectangleShape({ width: this.width, height: this.height }).addChildTo(this);
           c.alpha = 0.3;
         });
-        // this.one('removed', e => {
-        //   this._collision[0].remove();
-        //   this._collision[1].remove();
-        //   this._collision[2].remove();
-        //   this._collision[3].remove();
-        // });
+        this.one('removed', e => {
+          this._collision[0].remove();
+          this._collision[1].remove();
+          this._collision[2].remove();
+          this._collision[3].remove();
+        });
       } else {
         this._collision[0].alpha = 0.0;
         this._collision[1].alpha = 0.0;
@@ -232,6 +232,7 @@ phina.namespace(function() {
     }
       return this;
     },
+
     //地形当たり判定
     checkMapCollision: function() {
       if (this.ignoreCollision) return this;
@@ -300,6 +301,25 @@ phina.namespace(function() {
       return this;
     },
 
+    //地形当たり判定（特定地点チェックのみ）衝突したものを配列で返す
+    checkMapCollision2: function(x, y, width, height) {
+      x = x || this.x;
+      y = y || this.y;
+      width = width || 1;
+      height = height || 1;
+      const c = DisplayElement({ width, height }).setPosition(x, y).addChildTo(this.parentScene.debugLayer);
+      let ret = null;
+      this.parentScene.collisionLayer.children.forEach(function(e) {
+        if (e.type == "ladder" || e.type == "stairs") return;
+        if (e.hitTestElement(c)) {
+          if (ret == null) ret = [];
+          ret.push(e);
+        }
+      });
+      c.remove();
+      return ret;
+    },
+
     //当たり判定結果反映処理
     collisionProcess: function() {
       var w = Math.floor(this.width / 2) + 6;
@@ -360,25 +380,6 @@ phina.namespace(function() {
         }
       }
       return this;
-    },
-
-    //地形当たり判定（特定地点チェックのみ）衝突したものを配列で返す
-    checkMapCollision2: function(x, y, width, height) {
-      x = x || this.x;
-      y = y || this.y;
-      width = width || 1;
-      height = height || 1;
-      const c = DisplayElement({ width, height }).setPosition(x, y).addChildTo(this.parentScene.debugLayer);
-      let ret = null;
-      this.parentScene.collisionLayer.children.forEach(function(e) {
-        if (e.type == "ladder" || e.type == "stairs") return;
-        if (e.hitTestElement(c)) {
-          if (ret == null) ret = [];
-          ret.push(e);
-        }
-      });
-      c.remove();
-      return ret;
     },
 
     //キャラクタ同士当たり判定（ブロックのみ）

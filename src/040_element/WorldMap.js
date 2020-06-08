@@ -16,12 +16,17 @@ phina.namespace(function() {
         .addChildTo(this);
 
       this.collision = this.layerToArray("collision");
+      this.object = this.layerToArray("object");
       // this.floorData = this.layerToArray("floor");
       // this.event = this.layerToArray("event");
     },
 
     getCollisionData: function() {
       return this.collision;
+    },
+
+    getObjectData: function() {
+      return this.object;
     },
 
     getFloorData: function() {
@@ -32,12 +37,15 @@ phina.namespace(function() {
       const result = [];
       const layerData = this.data.getObjectGroup(layerName);
       layerData.objects.forEach(e => {
-        const element = RectangleShape({
+        const element = DisplayElement({
           width: e.width,
           height: e.height,
           x: e.x + e.width * 0.5,
           y: e.y + e.height * 0.5,
         });
+        if (DEBUG_COLLISION) {
+          RectangleShape({ width: e.width, height: e.height }).addChildTo(element);
+        }
         element.alpha = DEBUG_COLLISION ? 0.3 : 0;
         element.type = e.type;
         element.id = e.id;

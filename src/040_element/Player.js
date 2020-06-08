@@ -292,7 +292,7 @@ phina.define("Player", {
       this.numJump++;
     }
     //ジャンプ
-    const chk = this.checkMapCollision2(this.x, this.y-16, 5, 3);
+    const chk = this.checkMapCollision2(this.x, this.y - 16, 5, 3);
     const res = isUp ? !this.isJump && this.isOnFloor && !this.isOnLadder && !chk : !this.isJump && this.isOnFloor && !chk;
     if (res) {
       this.setAnimation("jump");

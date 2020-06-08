@@ -20,6 +20,7 @@ phina.namespace(function() {
                 "shadow": "assets/textures/shadow.png",
                 "weapons": "assets/textures/weapons.png",
                 "item": "assets/textures/item.png",
+                "itembox": "assets/textures/itembox.png",
                 "back": "assets/textures/back-s03b.png",
               },
               sound: {
