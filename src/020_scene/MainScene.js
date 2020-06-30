@@ -70,12 +70,9 @@ phina.namespace(function() {
       this.map.getObjectData().forEach(e => {
         switch (e.type) {
           case "itembox":
-            ItemBox(this, e)
-              .setPosition(e.x, e.y)
-              .addChildTo(this.objectLayer);
+            ItemBox(this, e).setPosition(e.x, e.y).addChildTo(this.objectLayer);
             break;
         }
-        e.addChildTo(this.objectLayer);
       });
 
       //プレイヤー
@@ -95,18 +92,8 @@ phina.namespace(function() {
         .setLoop(true);
 
       //体力ゲージ
-      const labelParam = {
-        fill: "white",
-        stroke: "black",
-        strokeWidth: 1,
-        align: "left",
-        baseline: "middle",
-        fontSize: 20,
-        fontWeight: ''
-      };
-      this.lifeGaugeLabel = Label({ text: "LIFE" }.$safe(labelParam)).addChildTo(this).setPosition(0, 10);
       const options = {
-        width:  200,
+        width: 200,
         height: 5,
         backgroundColor: 'transparent',
         fill: 'red',
@@ -114,16 +101,23 @@ phina.namespace(function() {
         strokeWidth: 2,
         gaugeColor: 'lime',
         cornerRadius: 0,
-        value: this.player.hp,
-        maxValue: this.player.hpMax,
       };
-      this.lifeGauge = phina.ui.Gauge(options).addChildTo(this).setOrigin(0, 0.5).setPosition(40, 10);
+      this.lifeGauge = phina.ui.Gauge(options.$extend({ value: this.player.hp, maxValue: this.player.hpMax })).setPosition(SCREEN_WIDTH * 0.25, 10).addChildTo(this);
       const player = this.player;
       this.lifeGauge.update = function() {
         this.value = player.hp;
-        this.width = player.hpMax * 2;
         this.maxValue = player.hpMax;
       };
+      if(this.remoteId) {
+        this.lifeGauge = phina.ui.Gauge(options.$extend({ value: 200, maxValue: 200 })).setRotation(180).setPosition(SCREEN_WIDTH * 0.75, 10).addChildTo(this);
+        const player = this.player;
+        this.lifeGauge.update = function() {
+          if (this.anotherPlayer) {
+            this.value = this.anotherPlayer.hp;
+            this.maxValue = this.anotherPlayer.hpMax;
+          }
+        };
+      }
     },
 
     update: function() {
