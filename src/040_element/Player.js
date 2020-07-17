@@ -92,7 +92,7 @@ phina.define("Player", {
     this.reset();
 
     //はしご接触判定用
-    this.ladderCollision = DisplayElement({ width: 16, height: 20 }).addChildTo(this.parentScene.debugLayer);
+    this.ladderCollision = DisplayElement({ width: 16, height: 20 }).addChildTo(this.parentScene.checkLayer);
     
     this.before = {
       //操作系
@@ -568,20 +568,19 @@ phina.define("Player", {
 
   //当たり判定用エレメントの位置再セット
   resetCollisionPosition: function() {
-    var w = Math.floor(this.width/2)+6;
-    var h = Math.floor(this.height/2)+6;
-    this._collision[0].setPosition(this.x, this.y - h);
-    this._collision[1].setPosition(this.x + w, this.y - 5);
-    this._collision[2].setPosition(this.x, this.y + h);
-    this._collision[3].setPosition(this.x - w, this.y - 5);
+    const w = Math.floor(this.width / 2) + 10;
+    const h = Math.floor(this.height / 2) + 10;
+    this._collision[0].setPosition(this.x, this.y - h);     //真下
+    this._collision[1].setPosition(this.x + w, this.y - 5); //左下
+    this._collision[2].setPosition(this.x, this.y + h);     //真上
+    this._collision[3].setPosition(this.x - w, this.y - 5); //右下
     this.ladderCollision.setPosition(this.x, this.y);
     return this;
   },
 
-  //頭上はしごチェック
+  //頭上/足元はしごチェック
   checkLadder: function(isHead) {
-    const h = Math.floor(this.height / 2) + 10 * isHead ? -1 : 1;
-    const c = DisplayElement({ width: 16, height: 2 }).setPosition(this.x, this.y + h);
+    const c = isHead ? this._collision[2] : this._collision[0];
     let ret = null;
     this.parentScene.collisionLayer.children.forEach(e => {
       if (e.hitTestElement(c)) {

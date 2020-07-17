@@ -202,10 +202,10 @@ phina.namespace(function() {
       //当たり判定情報再設定
       this.setupCollision();
 
-      this._collision[0].addChildTo(this.parentScene.debugLayer);
-      this._collision[1].addChildTo(this.parentScene.debugLayer);
-      this._collision[2].addChildTo(this.parentScene.debugLayer);
-      this._collision[3].addChildTo(this.parentScene.debugLayer);
+      this._collision[0].addChildTo(this.parentScene.checkLayer);
+      this._collision[1].addChildTo(this.parentScene.checkLayer);
+      this._collision[2].addChildTo(this.parentScene.checkLayer);
+      this._collision[3].addChildTo(this.parentScene.checkLayer);
 
       //当たり判定デバッグ用
       if (DEBUG_COLLISION) {
@@ -307,7 +307,7 @@ phina.namespace(function() {
       y = y || this.y;
       width = width || 1;
       height = height || 1;
-      const c = DisplayElement({ width, height }).setPosition(x, y).addChildTo(this.parentScene.debugLayer);
+      const c = DisplayElement({ width, height }).setPosition(x, y).addChildTo(this.parentScene.checkLayer);
       let ret = null;
       this.parentScene.collisionLayer.children.forEach(function(e) {
         if (e.type == "ladder" || e.type == "stairs") return;

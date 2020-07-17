@@ -56,6 +56,7 @@ phina.namespace(function() {
       this.enemyLayer = this.layers[LAYER_ENEMY];
       this.objectLayer = this.layers[LAYER_OBJECT];
       this.collisionLayer = this.layers[LAYER_COLLISION];
+      this.checkLayer = this.layers[LAYER_CHECK];
       this.debugLayer = this.layers[LAYER_DEBUG];
 
       //マップ作成
