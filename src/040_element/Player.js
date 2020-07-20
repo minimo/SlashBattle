@@ -155,7 +155,7 @@ phina.define("Player", {
           this.vx = 0;
           this.vy = -this.speedAscend;
           var c = this._collision[0];
-          if (!isHeadLadder && this.checkMapCollision2(c.x, c.y-6, c.width, c.height)) {
+          if (!isHeadLadder && this.checkMapCollision2(c.x, c.y - 6, c.width, c.height)) {
             this.vy = 0;
           }
         }

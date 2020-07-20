@@ -43,7 +43,7 @@ phina.namespace(function() {
         .setScale(1.5)
         .addChildTo(this);
 
-      this.base = DisplayElement().addChildTo(this).setPosition(-50, -250);
+      this.base = DisplayElement().setPosition(-50, -250).addChildTo(this);
 
       //レイヤー準備
       this.layers = [];
